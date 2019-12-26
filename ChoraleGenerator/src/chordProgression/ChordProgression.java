@@ -1,5 +1,11 @@
 package chordProgression;
 
+import jm.gui.show.ShowScore;
+import jm.music.data.CPhrase;
+import jm.music.data.Part;
+import jm.music.data.Score;
+import jm.util.Write;
+
 public abstract class ChordProgression {
 	// Single note key, since implementing classes will designate major/minor
 	private int key;
@@ -23,9 +29,23 @@ public abstract class ChordProgression {
 	}
 	
 	// Should generate a progression based on the key and length
-	abstract void generate();
+	protected abstract void generate();
 	
+	// Generates basic midi file based on progression
 	public void play() {
-		// TODO generate chord progression midi
+		// Creates a CPhrase based off the given pitches
+		CPhrase chords = new CPhrase();
+		for (int[] pitches : progression)
+			chords.addChord(pitches, 1);
+		
+		// Create score and add chords
+		Score s = new Score();
+		Part p = new Part();
+		p.addCPhrase(chords);
+		s.addPart(p);
+		
+		// Show score and produce midi track
+		new ShowScore(s);
+		Write.midi(s, "ChordProgression.midi");
 	}
 }
