@@ -3,7 +3,7 @@ package chordProgression;
 public abstract class ChordProgression {
 	// Single note key, since implementing classes will designate major/minor
 	private int key;
-	private Chord[] progression;
+	private int[][] progression;
 	private int length;
 	
 	// Should generate progression based on key and length
@@ -15,7 +15,7 @@ public abstract class ChordProgression {
 	}
 	
 	// Initialize progression from existing chords
-	public ChordProgression(int key, Chord[] progression) {
+	public ChordProgression(int key, int[][] progression) {
 		// Reduce key to min value
 		this.key = key % 12;
 		this.progression = progression;
