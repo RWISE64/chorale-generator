@@ -1,5 +1,7 @@
 package jMusicTest;
 
+import java.util.Arrays;
+
 import jm.JMC;
 import jm.music.data.*;
 import jm.util.*;
