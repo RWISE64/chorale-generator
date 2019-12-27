@@ -1,5 +1,8 @@
 package chordProgression;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import jm.gui.show.ShowScore;
 import jm.music.data.CPhrase;
 import jm.music.data.Part;
@@ -8,14 +11,15 @@ import jm.util.Write;
 
 public abstract class ChordProgression {
 	// Single note key, since implementing classes will designate major/minor
-	private int key;
-	private int[][] progression;
-	private int length;
+	protected int key;
+	protected int[][] progression;
+	protected int length;
+	protected final int octave = 12;
 	
 	// Should generate progression based on key and length
 	public ChordProgression(int key, int length) {
 		// Reduce key to min value
-		this.key = key % 12;
+		this.key = key % octave;
 		this.length = length;
 		this.generate();
 	}
@@ -23,7 +27,7 @@ public abstract class ChordProgression {
 	// Initialize progression from existing chords
 	public ChordProgression(int key, int[][] progression) {
 		// Reduce key to min value
-		this.key = key % 12;
+		this.key = key % octave;
 		this.progression = progression;
 		this.length = progression.length;
 	}
