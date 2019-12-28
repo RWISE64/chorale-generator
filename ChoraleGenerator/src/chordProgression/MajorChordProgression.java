@@ -1,8 +1,39 @@
 package chordProgression;
 
-import static jm.constants.Chords.*;
+import static jm.constants.Chords.DIMINISHED;
+import static jm.constants.Chords.MAJOR;
+import static jm.constants.Chords.MINOR;
+import static jm.constants.Chords.SEVENTH;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MajorChordProgression extends ChordProgression {
+	// Maps each Roman numeral to number of half steps from root of key
+	private static final Map<String, Integer> numeralRoots = initMap();
+	
+	/**
+	 * Initializes a constant mapping of Roman numerals to steps from root of key.
+	 * Currently manually define every case to avoid exceptions
+	 * @return Unmodifiable map mapping Roman numerals to number of half steps
+	 */
+	private static Map<String, Integer> initMap() {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		// TODO Add more secondary dominants
+		map.put("I", 0);
+		map.put("I_m7", 0);
+		map.put("ii", 2);
+		map.put("iii", 4);
+		map.put("IV", 5);
+		map.put("V", 7);
+		map.put("V_m7", 7);
+		map.put("vi", 9);
+		map.put("vii_d", 11);
+		map.put("vii_d_m7", 11);
+		return Collections.unmodifiableMap(map);
+	}
+	
 	MajorChordProgression(int key, int length) {
 		super(key, length);
 	}
@@ -12,78 +43,73 @@ public class MajorChordProgression extends ChordProgression {
 	}
 	
 	protected void generate() {
-		// TODO generate progression automagically
 		progression = new int[length][4];
 		// Generate progression backwards to ensure ending on I
+		String cur = "I";
+		String res = "I";
 		// Bass note = key + 4 octaves to be around middle C
-		progression[length - 1][0] = key + octave * 4;
+		progression[length - 1][0] = key + OCTAVE * 4;
 		for (int i = 0; i < MAJOR.length; i++)
 			progression[length - 1][1 + i] = progression[length - 1][0] + MAJOR[i];
-		progression[length - 1][3] = progression[length - 1][0] + octave;
 		// Fill in rest of progression
 		for (int i = length - 2; i >= 0; i--) {
 			// Get next chord and corresponding intervals
-			progression[i][0] = getPrevious(progression[i + 1][0]) + octave * 4;
-			int[] intervals = getIntervals(progression[i][0]);
+			cur = getPrevious(cur);
+			res = cur + "-" + res;
+			// Bass note = key + half steps up + 4 octaves
+			progression[i][0] = key + numeralRoots.get(cur) + OCTAVE * 4;
+			int[] intervals = getIntervals(cur);
 			for (int j = 0; j < intervals.length; j++)
 				progression[i][1 + j] = progression[i][0] + intervals[j];
-			if (intervals.length < 4) 
-				progression[i][3] = progression[i][0] + octave;
 		}
+		System.out.println(res);
 	}
 	
-	// Gets inner intervals of cur
-	private int[] getIntervals(int cur) {
-		switch (cur % 12) {
-			case (7):
-				return SEVENTH;
-			case (11):
-				return DIMINISHED;
-			case (0):
-			case (5):
-				return MAJOR;
-			case (2):
-			case (4):
-			case (9):
-				return MINOR;
-			default:
-				return MAJOR;
-		}
-	}
-	
-	// Gets a random chord that could lead into cur
-	private int getPrevious(int cur) {
-		// TODO Check this / convert to Roman numerals
-		switch (cur % octave) {
-			case (0): {
-				int[] opt = {5, 7, 11};
+	// Gets a random chord that could lead into Roman numeral cur
+	private String getPrevious(String cur) {
+		// TODO Check this
+		switch (cur) {
+			case ("I"): {
+				String[] opt = {"IV", "V", "V_m7", "vii_d", "vii_d_m7"};
 				return opt[(int) (Math.random() * opt.length)];
 			}
-			case (2): {
-				int[] opt = {0, 5, 9};
+			case ("I_m7"): {
+				String[] opt = {"I", "IV", "V", "V_m7", "vii_d", "vii_d_m7"};
 				return opt[(int) (Math.random() * opt.length)];
 			}
-			case (4): {
-				return 0;
-			}
-			case (5): {
-				int[] opt = {0, 4, 9};
+			case ("ii"): {
+				String[] opt = {"IV", "vi", "I_m7"};
 				return opt[(int) (Math.random() * opt.length)];
 			}
-			case (7): {
-				int[] opt = {0, 2, 5};
+			case ("iii"): {
+				return "I";
+			}
+			case ("IV"): {
+				String[] opt = {"I", "iii", "vi", "I_m7"};
 				return opt[(int) (Math.random() * opt.length)];
 			}
-			case (9): {
-				int[] opt = {0, 4, 7};
+			case ("V"): {
+				String[] opt = {"I", "ii", "IV"};
 				return opt[(int) (Math.random() * opt.length)];
 			}
-			case (11): {
-				int[] opt = {0, 2, 5};
+			case ("V_m7"): {
+				String[] opt = {"I", "ii", "IV", "V"};
+				return opt[(int) (Math.random() * opt.length)];
+			}
+			case ("vi"): {
+				String[] opt = {"I", "iii", "V", "V_m7"};
+				return opt[(int) (Math.random() * opt.length)];
+			}
+			case ("vii_d"): {
+				String[] opt = {"I", "ii", "IV"};
+				return opt[(int) (Math.random() * opt.length)];
+			}
+			case ("vii_d_m7"): {
+				String[] opt = {"I", "ii", "IV", "vii_d"};
 				return opt[(int) (Math.random() * opt.length)];
 			}
 			default: {
-				return 0;
+				return "I";
 			}
 		}
 	}
